@@ -1,68 +1,82 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
+      home: MainPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  bool isExpanded = false;
+class _MainPageState extends State<MainPage> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            AnimatedAlign(
-              alignment: isExpanded ? Alignment.centerLeft : Alignment.center,
-              duration: Duration(seconds: 1),
-              curve: Curves.easeInOut,
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-                child: Image.asset('path/to/your/logo.png', width: 50), // Замените на свой логотип
+        title: InkWell(
+          onTap: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              // Логотип
+              Container(
+                child: Image.asset('web/icons/icon-192.png', width: 50)
               ),
-            ),
-            if (isExpanded) ...[
-              Spacer(),
-              _buildMenuButton('Лоты'),
-              _buildMenuButton('Новости'),
-              _buildMenuButton('Контакты'),
-              _buildMenuButton('Вход'),
+              // Кнопки, которые появляются
+              AnimatedPositioned(
+                duration: Duration(milliseconds: 500),
+                left: _isExpanded ? 0 : MediaQuery.of(context).size.width / 2 - 50, // Начальное и конечное положение кнопок
+                right: _isExpanded ? 0 : MediaQuery.of(context).size.width / 2 - 50,
+                top: _isExpanded ? 60 : 0, // Высота появления кнопок
+                child: Opacity(
+                  opacity: _isExpanded ? 1 : 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      _buildButton('Лоты'),
+                      _buildButton('Новости'),
+                      _buildButton('Контакты'),
+                      _buildButton('Вход'),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          ],
+          ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        centerTitle: true,
       ),
       body: Center(
-        child: Text('Главная страница'),
+        child: Text('Главный экран'),
       ),
     );
   }
 
-  Widget _buildMenuButton(String title) {
+  Widget _buildButton(String title) {
     return ElevatedButton(
       onPressed: () {
-        // Добавьте сюда вашу логику перехода
+        // Ваша логика навигации здесь
         print('$title pressed');
       },
       child: Text(title),
     );
   }
 }
+
