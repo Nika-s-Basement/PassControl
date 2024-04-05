@@ -36,8 +36,8 @@ router.get('/lots', async (req, res) => {
 
 // Добавить новый лот
 router.post('/lots', async (req, res) => {
-    const {title, description, initial_price, current_price, user_id} = req.body;
-    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *', [title, description, initial_price, current_price, user_id]);
+    const {title, description, initial_price, current_price, user_id, category} = req.body;
+    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [title, description, initial_price, current_price, user_id, category]);
     res.json(rows[0]);
 });
 
