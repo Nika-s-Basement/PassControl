@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {Pool} = require('pg');
 
+const {closeLots} = require('../logic/lotClosingLogic.js');
+
 const pool = new Pool({
     connectionString: 'postgresql://your_username:your_password@localhost:5432/your_database',
 });
@@ -33,10 +35,22 @@ router.get('/lots', async (req, res) => {
     res.json(rows);
 });
 
+// Получение активных лотов
+router.get('/lots/active', async (req, res) => {
+    const {rows} = await pool.query('SELECT * FROM lots WHERE is_active = true');
+    res.json(rows);
+});
+
+// Получение архивированных лотов
+router.get('/lots/archived', async (req, res) => {
+    const {rows} = await pool.query('SELECT * FROM lots WHERE is_active = false');
+    res.json(rows);
+});
+
 // Добавить новый лот
 router.post('/lots', async (req, res) => {
-    const {title, description, initial_price, current_price, user_id, category} = req.body;
-    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [title, description, initial_price, current_price, user_id, category]);
+    const {title, description, initial_price, current_price, user_id, category, active_until} = req.body;
+    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [title, description, initial_price, current_price, user_id, category, active_until]);
     res.json(rows[0]);
 });
 
@@ -54,5 +68,9 @@ router.post('/lots/:lot_id/bids', async (req, res) => {
     const {rows} = await pool.query('INSERT INTO bids (amount, lot_id, user_id) VALUES ($1, $2, $3) RETURNING *', [amount, lot_id, user_id]);
     res.json(rows[0]);
 });
+
+setInterval(async () => {
+    await closeLots();
+}, 60000); // Check every minute for lots to close
 
 module.exports = router;
