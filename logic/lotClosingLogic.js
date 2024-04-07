@@ -4,6 +4,8 @@ const pool = new Pool({
     connectionString: 'postgresql://your_username:your_password@localhost:5432/your_database',
 });
 
+
+
 const closeLots = async () => {
     const currentTime = new Date();
     const {rows} = await pool.query('SELECT * FROM lots WHERE active_until < $1 AND is_active = true', [currentTime]);
