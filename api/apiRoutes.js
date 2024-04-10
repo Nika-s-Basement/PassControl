@@ -55,13 +55,49 @@ router.get('/lots/archived', cors(), async (req, res) => {
     res.json(rows);
 });
 
-// Добавить новый лот
-router.post('/lots', cors(), async (req, res) => {
-    const {title, description, initial_price, current_price, user_id, category, active_until} = req.body;
-    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [title, description, initial_price, current_price, user_id, category, active_until]);
+// Получение лота по его id
+router.get('/lots/:id', cors(), async (req, res) => {
+    const lotId = req.params.id;
+    const {rows} = await pool.query('SELECT * FROM lots WHERE lot_id = $1', [lotId]);
+
+    if (rows.length === 0) {
+        return res.status(404).json({error: 'Lot not found'});
+    }
+
     logging(req, path);
     res.json(rows[0]);
 });
+
+// Добавить новый лот
+router.post('/lots', cors(), async (req, res) => {
+    const {title, description, initial_price, current_price, user_id, category, active_until} = req.body;
+    const categoryImageMap = {
+        'real_estate': 'media/real_estate.jpg',
+        'transport': 'media/transport.jpg',
+        'electronics': 'media/electronics.jpg',
+        'furniture': 'media/furniture.jpg',
+        'misc': 'media/misc.jpg'
+    };
+    const categoryImage = categoryImageMap[category] || 'media/default.jpg';
+    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, category_img, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [title, description, initial_price, current_price, user_id, category, categoryImage, active_until]);
+    logging(req, path);
+    res.json(rows[0]);
+});
+
+// Удалить лот по его id
+router.delete('/lots/:id', cors(), async (req, res) => {
+    const lotId = req.params.id;
+    const checkLotQuery = 'SELECT * FROM lots WHERE lot_id = $1';
+    const {rows: checkLotRows} = await pool.query(checkLotQuery, [lotId]);
+    if (checkLotRows.length === 0) {
+        return res.status(404).json({error: 'Lot not found'});
+    }
+    const deleteLotQuery = 'DELETE FROM lots WHERE lot_id = $1 RETURNING *';
+    const {rows: deletedLotRows} = await pool.query(deleteLotQuery, [lotId]);
+    logging(req, path);
+    res.json(deletedLotRows[0]);
+});
+
 
 // Получить все ставки на определённый лот
 router.get('/lots/:lot_id/bids', cors(), async (req, res) => {
