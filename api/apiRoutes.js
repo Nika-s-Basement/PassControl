@@ -4,7 +4,10 @@ const bodyParser = require('body-parser');
 const {closeLots} = require('../logic/lotClosingLogic.js');
 const cors = require("cors");
 const path = require("path");
-const { POOL } = require("../config");
+const {Pool} = require("pg");
+const POOL = new Pool({
+    connectionString: 'your_database',
+});
 
 const pool = POOL
 
@@ -28,18 +31,34 @@ router.post('/register', cors(), async (req, res) => {
 // Логин пользователя
 router.post('/login', cors(), async (req, res) => {
     const {username, password} = req.body;
-    const {rows} = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+    console.log(`${username} ${password}`)
+    const {rows} = await pool.query(`SELECT * FROM users WHERE username = $1 AND password = $2`, [username, password]);
     if (rows.length > 0) {
-        res.json({message: 'Login successful'});
+        res.json({message: 'Login successful', id: rows.id});
     } else {
         res.status(401).json({message: 'Login failed'});
     }
     logging(req, path);
 });
 
+router.get('/user/:username', cors(), async (req, res) => {
+    const username = req.params.username;
+    const {rows} = await pool.query('SELECT user_id FROM users WHERE username = $1', [username]);
+    logging(req, path);
+    res.json(rows);
+});
+
 // Получение всех лотов
 router.get('/lots', cors(), async (req, res) => {
     const {rows} = await pool.query('SELECT * FROM lots');
+    logging(req, path);
+    res.json(rows);
+});
+
+router.get('/lots/user/:id', cors(), async (req, res) => {
+    const userId = req.params.id;
+    console.log(req.params.id);
+    const {rows} = await pool.query('SELECT * FROM lots WHERE user_id = $1', [userId]);
     logging(req, path);
     res.json(rows);
 });
@@ -119,9 +138,9 @@ router.post('/lots/:lot_id/bids', cors(), async (req, res) => {
     res.json(rows[0]);
 });
 
-setInterval(async () => {
-    await closeLots();
-}, 60000);
+// setInterval(async () => {
+//     await closeLots();
+// }, 60000);
 
 const cheat = async () => {
     const {rows} = await pool.query('SELECT * FROM lots');
