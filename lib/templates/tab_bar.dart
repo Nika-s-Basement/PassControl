@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:skupka_kradenogo/pages/create_page.dart';
+import 'package:skupka_kradenogo/pages/user_page.dart';
+import 'package:skupka_kradenogo/utils/globals.dart';
 
 import 'package:skupka_kradenogo/pages/main_page.dart';
+import 'package:skupka_kradenogo/pages/sign_page.dart';
 
 
 class CustomPageController extends StatefulWidget {
@@ -11,11 +16,29 @@ class CustomPageController extends StatefulWidget {
 class _CustomPageControllerState extends State<CustomPageController>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _storage = const FlutterSecureStorage();
+  String? _token;
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(checkTokenAndUpdateTab);
+    checkTokenAndUpdateTab();
+  }
+
+  void checkTokenAndUpdateTab() async {
+    String? token = await _storage.read(key: 'username');
+    String? id = await _storage.read(key: 'id');
+    print(id);
+    if (id != null) {
+      fetchItems(flag: 'lots/user/$id');
+    }
+    setState(() {
+      _token = token;
+      _userId = id;
+    });
   }
 
   @override
@@ -45,14 +68,15 @@ class _CustomPageControllerState extends State<CustomPageController>
         controller: _tabController,
         children: [
           Center(child: Text('Новости')),
-          Center(child: CardsGrid()),
-          Center(child: Text('Контакты')),
-          Center(child: Text('Вход')),
+          Center(child: CardsGrid(itemArray: items,)),
+          Center(child: AddLotPage()),
+          Center(child: _token == null ? LoginPage(_tabController) : UserPage(),),
         ],
       ),
     );
   }
 }
+
 
 class CustomTabBar extends StatefulWidget {
   final TabController tabController;
@@ -65,13 +89,26 @@ class CustomTabBar extends StatefulWidget {
 
 class _CustomTabBarState extends State<CustomTabBar> {
   late double _indicatorPosition;
-  final List<String> _tabs = ['Новости', 'Лоты', 'Контакты', 'Вход'];
+  final List<String> _tabs = ['Обновления', 'Лоты', 'Создать', 'Вход'];
+  final _storage = const FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
     _indicatorPosition = 0;
+    checkTokenAndUpdateTab();
     widget.tabController.addListener(_setActiveTab);
+  }
+
+  void checkTokenAndUpdateTab() async {
+    String? token = await _storage.read(key: 'username');
+    setState(() {
+      if (token != null) {
+        _tabs[3] = token; // Обновляем, если токен есть
+      } else {
+        _tabs[3] = 'Вход'; // Обновляем, если токена нет
+      }
+    });
   }
 
   @override
@@ -83,6 +120,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
   void _setActiveTab() {
     setState(() {
       _indicatorPosition = widget.tabController.index.toDouble();
+      checkTokenAndUpdateTab();
     });
   }
 
