@@ -1,14 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Pool} = require('pg');
 
 const {closeLots} = require('../logic/lotClosingLogic.js');
 const cors = require("cors");
 const path = require("path");
+const { POOL } = require("../config");
 
-const pool = new Pool({
-    connectionString: 'postgresql://your_username:your_password@localhost:5432/your_database',
-});
+const pool = POOL
 
 
 const router = express.Router();
@@ -79,7 +77,7 @@ router.post('/lots', cors(), async (req, res) => {
         'misc': 'media/misc.jpg'
     };
     const categoryImage = categoryImageMap[category] || 'media/default.jpg';
-    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, category_img, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [title, description, initial_price, current_price, user_id, category, categoryImage, active_until]);
+    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, img_url, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [title, description, initial_price, current_price, user_id, category, categoryImage, active_until]);
     logging(req, path);
     res.json(rows[0]);
 });
@@ -116,9 +114,9 @@ router.post('/lots/:lot_id/bids', cors(), async (req, res) => {
     res.json(rows[0]);
 });
 
-// setInterval(async () => {
-//     await closeLots();
-// }, 60000);
+setInterval(async () => {
+    await closeLots();
+}, 60000);
 
 const cheat = async () => {
     const {rows} = await pool.query('SELECT * FROM lots');

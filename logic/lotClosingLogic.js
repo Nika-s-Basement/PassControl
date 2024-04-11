@@ -1,8 +1,6 @@
-const {Pool} = require('pg');
+const { POOL } = require("../config");
 
-const pool = new Pool({
-    connectionString: 'postgresql://your_username:your_password@localhost:5432/your_database',
-});
+const pool = POOL
 
 
 
