@@ -15,8 +15,13 @@ router.use(bodyParser.json());
 // Регистрация новых пользователей
 router.post('/register', cors(), async (req, res) => {
     const {username, password, email} = req.body;
-    const {rows} = await pool.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *', [username, password, email]);
-    res.json(rows[0]);
+    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
+    if (existingUser.rows.length > 0) {
+        res.status(400).json({error: 'User with the same username or email already exists'});
+    } else {
+        const {rows} = await pool.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING *', [username, password, email]);
+        res.json(rows[0]);
+    }
     logging(req, path);
 });
 
@@ -77,7 +82,7 @@ router.post('/lots', cors(), async (req, res) => {
         'misc': 'media/misc.jpg'
     };
     const categoryImage = categoryImageMap[category] || 'media/default.jpg';
-    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, img_url, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [title, description, initial_price, current_price, user_id, category, categoryImage, active_until]);
+    const {rows} = await pool.query('INSERT INTO lots (title, description, initial_price, current_price, user_id, category, image_url, active_until) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [title, description, initial_price, current_price, user_id, category, categoryImage, active_until]);
     logging(req, path);
     res.json(rows[0]);
 });
