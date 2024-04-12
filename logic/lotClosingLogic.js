@@ -1,6 +1,6 @@
 const {Pool} = require("pg");
 const POOL = new Pool({
-    connectionString: 'your_database',
+    connectionString: 'your_db',
 });
 
 const pool = POOL

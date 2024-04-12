@@ -2,14 +2,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const {Pool} = require("pg");
+const rateLimit = require("express-rate-limit");
 
 const {closeLots} = require('../logic/lotClosingLogic.js');
 const path = require("path");
 const pool = new Pool({
-    connectionString: 'your_database',
+    connectionString: 'your_db',
+});
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 
 const router = express.Router();
+router.use(limiter);
 router.use(bodyParser.json());
 
 function logging(req, route) {
