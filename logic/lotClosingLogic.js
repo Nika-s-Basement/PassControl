@@ -1,7 +1,9 @@
-const { POOL } = require("../config");
+const {Pool} = require("pg");
+const POOL = new Pool({
+    connectionString: 'your_database',
+});
 
 const pool = POOL
-
 
 
 const closeLots = async () => {
