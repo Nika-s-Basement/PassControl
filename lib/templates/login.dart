@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class LoginForm extends StatefulWidget {
-  late final TabController? tabController;
+  final TabController? tabController;
 
   LoginForm({this.tabController});
 
@@ -36,26 +36,43 @@ class _LoginFormState extends State<LoginForm> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            TextFormField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Имя пользователя'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Пожалуйста, введите имя пользователя';
-                }
-                return null;
-              },
+            Container(
+              width: 300, // Установка фиксированной ширины
+              child: TextFormField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Имя пользователя',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0), // Овальные границы
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите имя пользователя';
+                  }
+                  return null;
+                },
+              ),
             ),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Пароль'),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Пожалуйста, введите пароль';
-                }
-                return null;
-              },
+            SizedBox(height: 10), // Добавление пространства между полями
+            Container(
+              width: 300, // Установка фиксированной ширины
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Пароль',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0), // Овальные границы
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите пароль';
+                  }
+                  return null;
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -70,6 +87,7 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 }
+
 
 
 Future<void> login(String username, String password, TabController? tab) async {

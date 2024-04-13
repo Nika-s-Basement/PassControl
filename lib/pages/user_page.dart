@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skupka_kradenogo/constraints/colors.dart';
 
 import '../utils/globals.dart';
 import 'main_page.dart';
@@ -8,19 +9,20 @@ class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appColors?.primaryColor,
       body: Row(
         children: <Widget>[
           Expanded(
             child: Container(
-              color: Colors.red,
-              child: Center(
-                child: Text('Левая часть'),
+              color: const Color(0x50f44336),
+              child: const Center(
+                child: Text('Данные о пользователе'),
               ),
             ),
           ),
           Expanded(
             child: Container(
-              color: Colors.green,
+              color: const Color(0x504CAF50),
               child: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -38,7 +40,7 @@ class UserPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(child: CardsGrid(itemArray: items),)
+                    Expanded(child: CardsGrid(itemArray: items, isNeeded: false,),)
                   ],
                 )
               ),
@@ -46,7 +48,7 @@ class UserPage extends StatelessWidget {
           ),
           Expanded(
             child: Container(
-              color: Colors.blue,
+              color: const Color(0x502196F3),
               child: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,7 +66,7 @@ class UserPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(child: CardsGrid(itemArray: myItems),)
+                    Expanded(child: CardsGrid(itemArray: myItems, isNeeded: false,),)
                   ],
                 ),
               ),

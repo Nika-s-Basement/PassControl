@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:skupka_kradenogo/constraints/colors.dart';
 
 import 'package:skupka_kradenogo/utils/globals.dart';
+
+import '../templates/bid_input.dart';
 
 
 class CardsGrid extends StatefulWidget {
   late List<Item> itemArray;
-  CardsGrid({required this.itemArray});
+  late bool isNeeded;
+  CardsGrid({required this.itemArray, this.isNeeded=true});
   @override
   _CardsGridState createState() => _CardsGridState();
 }
@@ -66,128 +71,113 @@ class _CardsGridState extends State<CardsGrid> with TickerProviderStateMixin {
             return const Center(child: Text(
                 'Нет активных лотов'));
           } else {
-            return SizedBox(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width > 600 ? 600 : 300,
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery
-                      .of(context)
-                      .size
-                      .width > 600 ? 2 : 1,
-                  childAspectRatio: (3 / 5),
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                ),
-                itemCount: widget.itemArray.length,
-                itemBuilder: (context, index) {
-                  final item = widget.itemArray[index];
-                  return AnimatedBuilder(
-                    animation: _controllers[index],
-                    builder: (context, child) {
-                      return FadeTransition(
-                        opacity: _opacityAnimations[index],
-                        child: SlideTransition(
-                          position: _slideAnimations[index],
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: SizedBox(
-                      width: 170,
-                      height: 350,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: SizedBox(
-                                  height: 200,
-                                  child: Image.network(
-                                      'http://localhost:3000/${item.image}',
-                                      fit: BoxFit.cover),
+            return LayoutBuilder(
+            builder: (context, constraints) {
+              int crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+
+              return SizedBox(
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width > 600 ? 600 : 300,
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: (3 / 5),
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: widget.itemArray.length,
+                  itemBuilder: (context, index) {
+                    final item = widget.itemArray[index];
+                    return AnimatedBuilder(
+                      animation: _controllers[index],
+                      builder: (context, child) {
+                        return FadeTransition(
+                          opacity: _opacityAnimations[index],
+                          child: SlideTransition(
+                            position: _slideAnimations[index],
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 170,
+                        height: 350,
+                        child: Card(
+                          color: appColors?.secondaryColor,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: SizedBox(
+                                    height: 200,
+                                    child: Image.network(
+                                        'http://localhost:3000/${item.image}',
+                                        fit: BoxFit.cover),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(padding: const EdgeInsets.symmetric(
-                                        horizontal: 5),
-                                        child: Text(item.title,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20))),
-                                    Padding(padding: const EdgeInsets.symmetric(
-                                        horizontal: 8),
-                                        child: Text(item.subscription,
-                                            style: const TextStyle(
-                                                color: Colors.grey))),
-                                    const Spacer(),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5).copyWith(bottom: 5),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment
-                                            .spaceBetween,
-                                        children: [
-                                          TextButton(
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: Colors.lime,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius
-                                                      .circular(
-                                                      5)),
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  vertical: 10, horizontal: 20),
-                                            ),
-                                            onPressed: () {
-                                              // Здесь логика для кнопки "Купить"
-                                            },
-                                            child: const Text(
-                                              'Bid',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              item.price,
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .start,
+                                    children: [
+                                      Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          child: Text(item.title,
                                               style: const TextStyle(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 30, // Адаптируйте размер шрифта в зависимости от высоты вашей кнопки
-                                              ),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20))),
+                                      Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: Text(item.subscription,
+                                              style: const TextStyle(
+                                                  color: Colors.grey))),
+                                      const Spacer(),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5).copyWith(bottom: 5),
+                                        child: widget.isNeeded ? BidWidget(
+                                          price: item.price,
+                                          lotId: item.id,
+                                        ) : Align(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            '\$${item.price}',
+                                            key: const ValueKey('Price'),
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 30,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            );
+                    );
+                  },
+                ),
+              );
+            }
+    );
           }
         }
     );

@@ -1,7 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:skupka_kradenogo/constraints/colors.dart';
 
 class AddLotPage extends StatefulWidget {
   @override
@@ -65,63 +69,135 @@ class _AddLotPageState extends State<AddLotPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appColors?.primaryColor,
       appBar: AppBar(
-        title: Text("Add a Lot"),
+        backgroundColor: appColors?.primaryColor,
+        title: Text("Add a Lot", style: TextStyle(color: appColors?.textColor)),
       ),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.all(16),
-          children: <Widget>[
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Title'),
-              onSaved: (value) => _title = value,
-              validator: (value) => value!.isEmpty ? 'Please enter title' : null,
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Description'),
-              onSaved: (value) => _description = value,
-              validator: (value) => value!.isEmpty ? 'Please enter description' : null,
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Price'),
-              keyboardType: TextInputType.number,
-              onSaved: (value) => _price = double.tryParse(value!),
-              validator: (value) => value!.isEmpty ? 'Please enter price' : null,
-            ),
-            DropdownButtonFormField(
-              decoration: InputDecoration(labelText: 'Category'),
-              value: _category,
-              items: categories.keys.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  _category = value;
-                });
-              },
-              validator: (value) => value == null ? 'Please select a category' : null,
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Active Until'),
-              controller: TextEditingController(text: _activeUntil),
-              onTap: () {
-                _selectDate(context); // Вызов функции выбора даты при нажатии на поле
-              },
-              readOnly: true, // Сделаем поле только для чтения, так как дата выбирается через DatePicker
-              validator: (value) => value!.isEmpty ? 'Please enter active until date' : null,
-            ),
-            const SizedBox(height: 10,),
-            ElevatedButton(
-              onPressed: submitLot,
-              child: Text('Submit Lot'),
-            ),
-          ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 300,
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      child: TextFormField(
+                        style: TextStyle(color: appColors?.textColor),
+                        decoration: InputDecoration(
+                          labelText: 'Title',
+                          labelStyle: TextStyle(color: appColors?.textColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                        ),
+                        onSaved: (value) => _title = value,
+                        validator: (value) => value!.isEmpty ? 'Please enter title' : null,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      child: TextFormField(
+                        style: TextStyle(color: appColors?.textColor),
+                        decoration: InputDecoration(
+                          labelText: 'Description',
+                          labelStyle: TextStyle(color: appColors?.textColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                        ),
+                        onSaved: (value) => _description = value,
+                        validator: (value) => value!.isEmpty ? 'Please enter description' : null,
+                        maxLines: 4, // Увеличение количества строк для большего описания
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 20), // Промежуток между колонками
+              SizedBox(
+                width: 300,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      style: TextStyle(color: appColors?.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'Price',
+                        labelStyle: TextStyle(color: appColors?.textColor),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onSaved: (value) => _price = double.tryParse(value!),
+                      validator: (value) => value!.isEmpty ? 'Please enter price' : null,
+                    ),
+                    SizedBox(height: 10),
+                    DropdownButtonFormField(
+                      style: TextStyle(color: appColors?.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'Category',
+                        labelStyle: TextStyle(color: appColors?.textColor),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      value: _category,
+                      items: categories.keys.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          _category = value;
+                        });
+                      },
+                      dropdownColor: appColors?.secondaryColor,
+                      validator: (value) => value == null ? 'Please select a category' : null,
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      style: TextStyle(color: appColors?.textColor),
+                      decoration: InputDecoration(
+                        labelText: 'Active Until',
+                        labelStyle: TextStyle(color: appColors?.textColor),
+                        fillColor: appColors?.primaryColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      controller: TextEditingController(text: _activeUntil),
+                      onTap: () {
+                        _selectDate(context); // Вызов функции выбора даты
+                      },
+                      readOnly: true,
+                      validator: (value) => value!.isEmpty ? 'Please enter active until date' : null,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20,),
+          ElevatedButton(
+            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(appColors?.secondaryColor)),
+            onPressed: submitLot,
+            child: Text('Submit Lot', style: TextStyle(color: appColors?.textColor)),
+          ),
+        ]
         ),
       ),
     );
   }
 }
+

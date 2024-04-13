@@ -6,12 +6,14 @@ import 'dart:math';
 
 
 class Item {
-  final Image image;
+  final String id;
+  final String image;
   final String title;
   final String subscription;
   final String price;
 
   Item({
+    required this.id,
     required this.image,
     required this.title,
     required this.subscription,
@@ -48,6 +50,7 @@ class Item {
 // ];
 
 
+
 List<Item> items = [];
 List<Item> myItems = [];
 
@@ -61,6 +64,7 @@ Future<List<Item>?> fetchItems({String flag = 'lots/active'}) async {
 
       for (var itemJson in fetchedItems) {
         final item = Item(
+          id: itemJson['lot_id'].toString(),
           image: itemJson['image_url'],
           title: itemJson['title'],
           subscription: itemJson['description'],
@@ -68,7 +72,7 @@ Future<List<Item>?> fetchItems({String flag = 'lots/active'}) async {
         );
         loadedItems.add(item);
       }
-
+      renderImages();
       if (flag.contains('lots/active')) {
         items = loadedItems;
         return items;
@@ -85,4 +89,10 @@ Future<List<Item>?> fetchItems({String flag = 'lots/active'}) async {
     // Обработка исключений/ошибок запроса
   }
   return null;
+}
+
+void renderImages() {
+  for (Item item in items) {
+    Image.network(item.image);
+  }
 }

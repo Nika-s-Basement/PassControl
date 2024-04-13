@@ -36,54 +36,87 @@ class _RegisterFormState extends State<RegisterForm> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            TextFormField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Имя пользователя'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Пожалуйста, введите имя пользователя';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-              validator: (value) {
-                if (value == null || value.isEmpty || !value.contains('@')) {
-                  return 'Пожалуйста, введите корректный email';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Пароль'),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Пожалуйста, введите пароль';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _confirmPasswordController,
-              decoration: InputDecoration(labelText: 'Подтвердите пароль'),
-              obscureText: true,
-              validator: (value) {
-                if (value != _passwordController.text) {
-                  return 'Пароли не совпадают';
-                }
-                return null;
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: _register,
-                child: Text('Регистрация'),
+            Container(
+              width: 300,
+              child: TextFormField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Имя пользователя',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите имя пользователя';
+                  }
+                  return null;
+                },
               ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              width: 300,
+              child: TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty || !value.contains('@')) {
+                    return 'Пожалуйста, введите корректный email';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              width: 300,
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Пароль',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Пожалуйста, введите пароль';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+              width: 300,
+              child: TextFormField(
+                controller: _confirmPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Подтвердите пароль',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value != _passwordController.text) {
+                    return 'Пароли не совпадают';
+                  }
+                  return null;
+                },
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _register,
+              child: Text('Регистрация'),
             ),
           ],
         ),
@@ -91,6 +124,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 }
+
 
 Future<void> register(String username, String email, String password) async {
   final url = Uri.parse('http://localhost:3000/register');
